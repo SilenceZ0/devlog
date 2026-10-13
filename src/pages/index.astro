@@ -1,0 +1,97 @@
+---
+import PostCard from '../components/PostCard.astro';
+import Timeline from '../components/Timeline.astro';
+import Base from '../layouts/Base.astro';
+import { CATEGORIA_INFO, SITIO } from '../site.config';
+import { agruparPorCategoria, listarEntradas, listarHitos } from '../utils/posts';
+import { url } from '../utils/url';
+
+const entradas = await listarEntradas();
+const recientes = entradas.slice(0, 6);
+const hitos = await listarHitos();
+const hitosRecientes = hitos.slice(-4);
+const categorias = agruparPorCategoria(entradas);
+---
+
+<Base>
+	<div class="contenedor">
+		<section class="hero">
+			<p class="hero__saludo">Diario de desarrollo</p>
+			<h1 class="hero__titulo">
+				Proceso creativo de <span>{SITIO.nombre}</span>
+			</h1>
+			<p class="hero__texto">{SITIO.descripcion}</p>
+
+			<div class="hero__acciones">
+				<a class="boton boton--principal" href={url('/entradas/')}>
+					Leer las entradas
+				</a>
+				<a class="boton" href={url('/timeline/')}>Ver el timeline</a>
+				<a class="boton" href={url('/galeria/')}>Galería</a>
+			</div>
+		</section>
+
+		{
+			entradas.length === 0 ? (
+				<section class="seccion">
+					<p class="vacio">
+						Todavía no hay entradas. Crea la primera con{' '}
+						<code>npm run nuevo "Título de la entrada"</code>.
+					</p>
+				</section>
+			) : (
+				<>
+					<section class="seccion" aria-labelledby="titulo-recientes">
+						<div class="seccion__cabecera">
+							<h2 class="seccion__titulo" id="titulo-recientes">
+								Últimas entradas
+							</h2>
+							<a class="seccion__mas" href={url('/entradas/')}>
+								Ver todas ({entradas.length}) →
+							</a>
+						</div>
+						<div class="rejilla">
+							{recientes.map((entrada) => (
+								<PostCard entrada={entrada} />
+							))}
+						</div>
+					</section>
+
+					{hitosRecientes.length > 0 && (
+						<section class="seccion" aria-labelledby="titulo-timeline">
+							<div class="seccion__cabecera">
+								<h2 class="seccion__titulo" id="titulo-timeline">
+									El proceso, en hitos
+								</h2>
+								<a class="seccion__mas" href={url('/timeline/')}>
+									Timeline completo →
+								</a>
+							</div>
+							<Timeline hitos={hitosRecientes} invertir />
+						</section>
+					)}
+
+					{categorias.length > 0 && (
+						<section class="seccion" aria-labelledby="titulo-categorias">
+							<div class="seccion__cabecera">
+								<h2 class="seccion__titulo" id="titulo-categorias">
+									Explorar por categoría
+								</h2>
+							</div>
+							<div class="tarjeta__pie">
+								{categorias.map((categoria) => (
+									<a
+										class="pildora"
+										href={url(`/categorias/${categoria.id}/`)}
+									>
+										{CATEGORIA_INFO[categoria.id].etiqueta} · {categoria.total}
+									</a>
+								))}
+							</div>
+						</section>
+					)}
+				</>
+			)
+		}
+	</div>
+</Base>

@@ -1,0 +1,26 @@
+---
+import Timeline from '../components/Timeline.astro';
+import Base from '../layouts/Base.astro';
+import { SITIO } from '../site.config';
+import { listarHitos } from '../utils/posts';
+
+const hitos = await listarHitos();
+---
+
+<Base
+	titulo={`Timeline · ${SITIO.nombre}`}
+	descripcion="El proceso creativo del proyecto, hito a hito."
+>
+	<div class="contenedor contenedor--texto">
+		<header class="cabecera-pagina">
+			<p class="etiqueta-seccion">Proceso creativo</p>
+			<h1>Timeline</h1>
+			<p>
+				Los hitos importantes del desarrollo, del más antiguo al más reciente. Se
+				gestionan desde <code>src/data/hitos.json</code>.
+			</p>
+		</header>
+
+		<Timeline hitos={hitos} />
+	</div>
+</Base>

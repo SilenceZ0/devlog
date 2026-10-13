@@ -1,0 +1,70 @@
+---
+titulo: 'Idea inicial y núcleo del juego'
+resumen: 'De dónde sale Proj_TheYE, qué quiero que sea y cuál es el bucle de juego que voy a prototipar primero.'
+fecha: 2026-10-13
+categoria: devlog
+tags: ['idea', 'diseño', 'prototipado', 'godot']
+portada: './portada.png'
+portadaAlt: 'Composición de color de referencia del proyecto'
+galeria:
+  - src: './boceto-personaje.png'
+    alt: 'Primer boceto del personaje principal'
+  - src: './paleta.png'
+    alt: 'Paleta de color base del proyecto'
+  - src: './hud-mockup.png'
+    alt: 'Prueba de composición del HUD'
+estado: idea
+destacado: true
+---
+
+Esta es la primera entrada del devlog, y también la plantilla que puedes copiar
+para el resto: mira el front matter de arriba y cómo se referencian las imágenes.
+
+## La chispa
+
+Todo empieza con una imagen muy concreta en la cabeza. Todavía no es un juego,
+es una sensación: quiero que **el jugador reconozca el mundo antes de que el
+juego se lo explique**. Ese es el objetivo que va a decidir todo lo demás.
+
+## El bucle de juego
+
+Lo que voy a prototipar antes que nada es un bucle muy pequeño, de 30 segundos,
+que se pueda repetir sin aburrir:
+
+1. **Observar**: leer el entorno y detectar el patrón.
+2. **Decidir**: elegir el camino o la acción con la información que tengo.
+3. **Actuar**: ejecutar y ver la consecuencia de inmediato.
+4. **Aprender**: la siguiente vuelta se juega mejor sin explicaciones nuevas.
+
+> Si ese bucle no aguanta treinta segundos, ninguna cantidad de arte lo va a
+> arreglar. Eso primero.
+
+## Qué entra en el prototipo
+
+| Sistema | En el prototipo | Fuera por ahora |
+| --- | --- | --- |
+| Movimiento | Sí, con cámara | Animaciones finales |
+| Interacción | Una sola mecánica | Inventario, diálogos |
+| Arte | Formas de color planas | Ilustración final |
+| Sonido | No | Música y efectos |
+
+## Herramientas
+
+El proyecto va en **Godot**. La idea es mantener el prototipo lo más desnudo
+posible: cajas, colores y texto de depuración.
+
+```gdscript
+func _physics_process(delta: float) -> void:
+	var direccion := Input.get_vector("izquierda", "derecha", "arriba", "abajo")
+	velocity = direccion * velocidad
+	move_and_slide()
+```
+
+## Siguiente paso
+
+Antes de escribir más, quiero responder por escrito a dos preguntas: **qué se
+repite** y **qué cambia** en cada vuelta del bucle. Si no consigo contestarlas,
+no hay juego todavía.
+
+En las próximas entradas iré colgando el prototipo, los bocetos y las decisiones
+según las vaya tomando.

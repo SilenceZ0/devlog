@@ -1,0 +1,11 @@
+---
+import { ESTADO_INFO, type EstadoId } from '../site.config';
+
+interface Props {
+	estado: EstadoId;
+}
+
+const { estado } = Astro.props;
+---
+
+<span class="pildora pildora--estado" data-estado={estado}>{ESTADO_INFO[estado]}</span>

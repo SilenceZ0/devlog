@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+import { CATEGORIA_INFO, SITIO } from '../../site.config';
+import { agruparPorCategoria, listarEntradas } from '../../utils/posts';
+import { url } from '../../utils/url';
+
+const entradas = await listarEntradas();
+const categorias = agruparPorCategoria(entradas);
+---
+
+<Base titulo={`Categorías · ${SITIO.nombre}`} descripcion="Explora el devlog por categorías.">
+	<div class="contenedor">
+		<header class="cabecera-pagina">
+			<p class="etiqueta-seccion">Taxonomía</p>
+			<h1>Categorías</h1>
+			<p>Cada entrada pertenece a una sola categoría.</p>
+		</header>
+
+		{
+			categorias.length === 0 ? (
+				<p class="vacio">Todavía no hay entradas, así que no hay categorías.</p>
+			) : (
+				<div class="rejilla">
+					{categorias.map((categoria) => (
+						<a class="tarjeta" href={url(`/categorias/${categoria.id}/`)}>
+							<div class="tarjeta__cuerpo">
+								<h2 class="tarjeta__titulo">
+									{CATEGORIA_INFO[categoria.id].etiqueta}
+								</h2>
+								<p class="tarjeta__resumen">
+									{CATEGORIA_INFO[categoria.id].descripcion}
+								</p>
+								<p class="tarjeta__meta">
+									<span class="pildora pildora--acento">
+										{categoria.total}{' '}
+										{categoria.total === 1 ? 'entrada' : 'entradas'}
+									</span>
+								</p>
+							</div>
+						</a>
+					))}
+				</div>
+			)
+		}
+	</div>
+</Base>

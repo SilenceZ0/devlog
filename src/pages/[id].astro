@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+
+import EntradaLayout from '../layouts/Entrada.astro';
+
+export async function getStaticPaths() {
+	const entradas = await getCollection('devlog', ({ data }) =>
+		import.meta.env.PROD ? !data.borrador : true,
+	);
+
+	return entradas.map((entrada) => ({
+		params: { id: entrada.id },
+		props: { entrada },
+	}));
+}
+
+const { entrada } = Astro.props;
+---
+
+<EntradaLayout entrada={entrada} />

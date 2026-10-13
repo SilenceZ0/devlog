@@ -1,0 +1,50 @@
+---
+interface Props {
+	/** Identificador del vídeo en YouTube (lo que va después de `v=`). */
+	id: string;
+	titulo?: string;
+}
+
+const { id, titulo = 'Reproducir vídeo' } = Astro.props;
+---
+
+<div class="video">
+	<button
+		type="button"
+		class="video__disparador"
+		data-video={id}
+		data-video-titulo={titulo}
+		aria-label={`Reproducir: ${titulo}`}
+	>
+		<span class="video__icono" aria-hidden="true">
+			<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+				<path d="M8 5v14l11-7z"></path>
+			</svg>
+		</span>
+		<span class="video__texto">{titulo}</span>
+	</button>
+</div>
+
+<script>
+	// Fachada: hasta que no se pulsa no se contacta con YouTube.
+	document.addEventListener('click', (evento) => {
+		const destino = evento.target;
+		if (!(destino instanceof Element)) return;
+
+		const boton = destino.closest<HTMLButtonElement>('[data-video]');
+		if (!boton) return;
+
+		const id = boton.dataset.video;
+		const titulo = boton.dataset.videoTitulo ?? 'Vídeo';
+		if (!id) return;
+
+		const marco = document.createElement('iframe');
+		marco.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+		marco.title = titulo;
+		marco.allow =
+			'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+		marco.allowFullscreen = true;
+
+		boton.replaceWith(marco);
+	});
+</script>

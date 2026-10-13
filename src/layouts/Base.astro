@@ -1,0 +1,177 @@
+---
+import { NAVEGACION, SITIO } from '../site.config';
+import { esActiva, url } from '../utils/url';
+import '../styles/global.css';
+
+interface Props {
+	titulo?: string;
+	descripcion?: string;
+	imagen?: string;
+	tipo?: 'website' | 'article';
+}
+
+const {
+	titulo = SITIO.titulo,
+	descripcion = SITIO.descripcion,
+	imagen,
+	tipo = 'website',
+} = Astro.props;
+
+const rutaActual = Astro.url.pathname;
+
+// Construimos el canonical a mano: manipular `pathname` con `new URL` produce
+// `//` (URL relativa al protocolo) y rompe el build.
+const origen = (Astro.site ?? new URL('https://silencez0.github.io')).origin;
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const rutaRelativa = rutaActual.replace(new RegExp(`^${base}`), '').replace(/^\/+/, '');
+const canonical = `${origen}${base}/${rutaRelativa}`;
+const ogImagen = imagen
+	? imagen.startsWith('/')
+		? `${origen}${imagen}`
+		: new URL(imagen, origen).href
+	: undefined;
+---
+
+<!doctype html>
+<html lang={SITIO.idioma} data-tema="oscuro">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<title>{titulo}</title>
+		<meta name="description" content={descripcion} />
+
+		{/* El sitio no debe ser indexado por buscadores. */}
+		{SITIO.noindex && <meta name="robots" content="noindex, nofollow" />}
+
+		<meta name="generator" content={Astro.generator} />
+		<meta name="theme-color" content="#0d1014" />
+		<link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+
+		<link rel="canonical" href={canonical} />
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title={`${SITIO.titulo} · RSS`}
+			href={url('/rss.xml')}
+		/>
+
+		<meta property="og:type" content={tipo} />
+		<meta property="og:title" content={titulo} />
+		<meta property="og:description" content={descripcion} />
+		<meta property="og:url" content={canonical} />
+		{ogImagen && <meta property="og:image" content={ogImagen} />}
+
+		{/* Aplica el tema guardado antes de pintar, para evitar el destello. */}
+		<script is:inline>
+			(() => {
+				try {
+					const guardado = localStorage.getItem('tema');
+					const sistema = window.matchMedia('(prefers-color-scheme: light)').matches
+						? 'claro'
+						: 'oscuro';
+					document.documentElement.dataset.tema = guardado || sistema;
+				} catch {
+					/* sin persistencia disponible */
+				}
+			})();
+		</script>
+	</head>
+
+	<body>
+		<a class="saltar-a-contenido" href="#contenido">Saltar al contenido</a>
+
+		<header class="cabecera">
+			<div class="contenedor cabecera__interior">
+				<a class="marca" href={url('/')}>
+					<span class="marca__punto" aria-hidden="true"></span>
+					<span>{SITIO.nombre}</span>
+				</a>
+
+				<nav class="nav" aria-label="Navegación principal">
+					{
+						NAVEGACION.map((enlace) => (
+							<a
+								href={url(enlace.ruta)}
+								aria-current={esActiva(rutaActual, enlace.ruta) ? 'page' : undefined}
+							>
+								{enlace.texto}
+							</a>
+						))
+					}
+					<button
+						class="boton-tema"
+						type="button"
+						data-boton-tema
+						aria-label="Cambiar entre tema claro y oscuro"
+						title="Cambiar tema"
+					>
+						<svg
+							class="boton-tema__sol"
+							width="17"
+							height="17"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							aria-hidden="true"
+						>
+							<circle cx="12" cy="12" r="4"></circle>
+							<path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+						</svg>
+						<svg
+							class="boton-tema__luna"
+							width="17"
+							height="17"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							aria-hidden="true"
+						>
+							<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+						</svg>
+					</button>
+				</nav>
+			</div>
+		</header>
+
+		<main id="contenido">
+			<slot />
+		</main>
+
+		<footer class="pie">
+			<div class="contenedor pie__interior">
+				<p>
+					© {new Date().getFullYear()} {SITIO.nombre} · Diario de desarrollo
+				</p>
+				<p>
+					{SITIO.autor && <span>{SITIO.autor} · </span>}
+					<a href={url('/rss.xml')}>RSS</a>
+					{SITIO.enlaces.map((enlace) => (
+						<>
+							{' · '}
+							<a href={enlace.url} rel="me noopener">{enlace.texto}</a>
+						</>
+					))}
+				</p>
+			</div>
+		</footer>
+
+		<script>
+			const boton = document.querySelector('[data-boton-tema]');
+			boton?.addEventListener('click', () => {
+				const raiz = document.documentElement;
+				const siguiente = raiz.dataset.tema === 'claro' ? 'oscuro' : 'claro';
+				raiz.dataset.tema = siguiente;
+				try {
+					localStorage.setItem('tema', siguiente);
+				} catch {
+					/* sin persistencia disponible */
+				}
+			});
+		</script>
+	</body>
+</html>

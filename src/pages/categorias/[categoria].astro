@@ -1,0 +1,52 @@
+---
+import PostCard from '../../components/PostCard.astro';
+import Base from '../../layouts/Base.astro';
+import { CATEGORIA_INFO, SITIO, type CategoriaId } from '../../site.config';
+import { agruparPorCategoria, listarEntradas } from '../../utils/posts';
+import { url } from '../../utils/url';
+
+export async function getStaticPaths() {
+	const entradas = await listarEntradas();
+	const categorias = agruparPorCategoria(entradas);
+
+	return categorias.map((categoria) => ({
+		params: { categoria: categoria.id },
+		props: { categoriaId: categoria.id },
+	}));
+}
+
+interface Props {
+	categoriaId: CategoriaId;
+}
+
+const { categoriaId } = Astro.props;
+const info = CATEGORIA_INFO[categoriaId];
+const entradas = (await listarEntradas()).filter(
+	(entrada) => entrada.data.categoria === categoriaId,
+);
+---
+
+<Base
+	titulo={`${info.etiqueta} · ${SITIO.nombre}`}
+	descripcion={info.descripcion}
+>
+	<div class="contenedor">
+		<header class="cabecera-pagina">
+			<p class="etiqueta-seccion">
+				<a href={url('/categorias/')}>Categorías</a>
+			</p>
+			<h1>{info.etiqueta}</h1>
+			<p>{info.descripcion}</p>
+		</header>
+
+		<div class="seccion__cabecera">
+			<span class="etiqueta-seccion">
+				{entradas.length} {entradas.length === 1 ? 'entrada' : 'entradas'}
+			</span>
+		</div>
+
+		<div class="rejilla">
+			{entradas.map((entrada) => <PostCard entrada={entrada} />)}
+		</div>
+	</div>
+</Base>

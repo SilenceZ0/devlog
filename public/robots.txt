@@ -1,0 +1,4 @@
+# Este sitio no debe aparecer en buscadores.
+# No hay sitemap a propósito y todas las páginas llevan noindex.
+User-agent: *
+Disallow: /

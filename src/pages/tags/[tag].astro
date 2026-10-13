@@ -1,0 +1,47 @@
+---
+import PostCard from '../../components/PostCard.astro';
+import Base from '../../layouts/Base.astro';
+import { SITIO } from '../../site.config';
+import { agruparPorTag, listarEntradas, slugificar } from '../../utils/posts';
+import { url } from '../../utils/url';
+
+export async function getStaticPaths() {
+	const entradas = await listarEntradas();
+	const tags = agruparPorTag(entradas);
+
+	return tags.map((tag) => ({
+		params: { tag: tag.slug },
+		props: { nombre: tag.nombre },
+	}));
+}
+
+interface Props {
+	nombre: string;
+}
+
+const { nombre } = Astro.props;
+const entradas = (await listarEntradas()).filter((entrada) =>
+	entrada.data.tags.some((tag) => slugificar(tag) === Astro.params.tag),
+);
+---
+
+<Base titulo={`#${nombre} · ${SITIO.nombre}`} descripcion={`Entradas etiquetadas con ${nombre}.`}>
+	<div class="contenedor">
+		<header class="cabecera-pagina">
+			<p class="etiqueta-seccion">
+				<a href={url('/tags/')}>Etiquetas</a>
+			</p>
+			<h1>#{nombre}</h1>
+		</header>
+
+		<div class="seccion__cabecera">
+			<span class="etiqueta-seccion">
+				{entradas.length} {entradas.length === 1 ? 'entrada' : 'entradas'}
+			</span>
+		</div>
+
+		<div class="rejilla">
+			{entradas.map((entrada) => <PostCard entrada={entrada} />)}
+		</div>
+	</div>
+</Base>

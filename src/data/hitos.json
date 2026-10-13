@@ -1,0 +1,24 @@
+[
+	{
+		"id": "documento-diseno",
+		"fecha": "2026-09-28",
+		"titulo": "Primer documento de diseño",
+		"descripcion": "Notas sueltas convertidas en un documento con la idea, la fantasía central y el público objetivo.",
+		"estado": "idea"
+	},
+	{
+		"id": "prototipo-movimiento",
+		"fecha": "2026-10-08",
+		"titulo": "Prototipo de movimiento",
+		"descripcion": "Primera prueba en Godot: el personaje se mueve y la cámara lo sigue. Aún sin nada de juego real.",
+		"estado": "prototipo"
+	},
+	{
+		"id": "nace-el-devlog",
+		"fecha": "2026-10-13",
+		"titulo": "Nace el devlog",
+		"descripcion": "Montado el diario de desarrollo para dejar constancia del proceso creativo desde el principio.",
+		"estado": "idea",
+		"entrada": "2026-10-13-idea-inicial"
+	}
+]

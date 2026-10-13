@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import { SITIO } from '../../site.config';
+import { agruparPorTag, listarEntradas } from '../../utils/posts';
+import { url } from '../../utils/url';
+
+const entradas = await listarEntradas();
+const tags = agruparPorTag(entradas);
+---
+
+<Base titulo={`Tags · ${SITIO.nombre}`} descripcion="Todas las etiquetas del devlog.">
+	<div class="contenedor contenedor--texto">
+		<header class="cabecera-pagina">
+			<p class="etiqueta-seccion">Taxonomía</p>
+			<h1>Etiquetas</h1>
+			<p>Una entrada puede tener varias etiquetas.</p>
+		</header>
+
+		{
+			tags.length === 0 ? (
+				<p class="vacio">Todavía no hay etiquetas.</p>
+			) : (
+				<div class="tarjeta__pie">
+					{tags.map((tag) => (
+						<a class="pildora" href={url(`/tags/${tag.slug}/`)}>
+							#{tag.nombre} · {tag.total}
+						</a>
+					))}
+				</div>
+			)
+		}
+	</div>
+</Base>

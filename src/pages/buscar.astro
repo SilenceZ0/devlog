@@ -1,0 +1,29 @@
+---
+import Search from 'astro-pagefind/components/Search.astro';
+
+import Base from '../layouts/Base.astro';
+import { SITIO } from '../site.config';
+import { listarEntradas } from '../utils/posts';
+
+const total = (await listarEntradas()).length;
+---
+
+<Base
+	titulo={`Buscar · ${SITIO.nombre}`}
+	descripcion="Buscador interno de todas las entradas del devlog."
+>
+	<div class="contenedor contenedor--texto">
+		<header class="cabecera-pagina">
+			<p class="etiqueta-seccion">Buscador</p>
+			<h1>Buscar en el devlog</h1>
+			<p>
+				Índice local sobre {total} {total === 1 ? 'entrada' : 'entradas'}. Escribe
+				unas palabras y pulsa Enter.
+			</p>
+		</header>
+
+		<div class="buscador">
+			<Search />
+		</div>
+	</div>
+</Base>

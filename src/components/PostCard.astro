@@ -1,0 +1,82 @@
+---
+import { Image } from 'astro:assets';
+
+import { CATEGORIA_INFO } from '../site.config';
+import { enlaceEntrada, formatearFecha, type Entrada } from '../utils/posts';
+import { url } from '../utils/url';
+import EstadoBadge from './EstadoBadge.astro';
+
+interface Props {
+	entrada: Entrada;
+}
+
+const { entrada } = Astro.props;
+const { data } = entrada;
+const enlace = enlaceEntrada(entrada);
+const categoria = CATEGORIA_INFO[data.categoria];
+---
+
+<article class="tarjeta">
+	<div class="tarjeta__media" aria-hidden="true">
+		{
+			data.portada ? (
+				<Image
+					src={data.portada}
+					alt=""
+					widths={[400, 800]}
+					sizes="(max-width: 40rem) 90vw, 320px"
+					loading="lazy"
+					decoding="async"
+				/>
+			) : (
+				<span class="tarjeta__media--vacia">sin portada</span>
+			)
+		}
+	</div>
+
+	<div class="tarjeta__cuerpo">
+		<div class="tarjeta__meta">
+			<a class="pildora pildora--acento" href={url(`/categorias/${data.categoria}/`)}>
+				{categoria.etiqueta}
+			</a>
+			<EstadoBadge estado={data.estado} />
+			<span>{formatearFecha(data.fecha)}</span>
+		</div>
+
+		<h3 class="tarjeta__titulo">
+			<a href={enlace}>{data.titulo}</a>
+		</h3>
+
+		<p class="tarjeta__resumen">{data.resumen}</p>
+
+		{
+			data.tags.length > 0 && (
+				<div class="tarjeta__pie">
+					{data.tags.slice(0, 3).map((tag) => (
+						<span class="pildora">#{tag}</span>
+					))}
+				</div>
+			)
+		}
+	</div>
+</article>
+
+<style>
+	.tarjeta {
+		position: relative;
+	}
+
+	/* El título actúa de enlace estirado: toda la tarjeta es clicable. */
+	.tarjeta__titulo a::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+	}
+
+	/* Los enlaces secundarios quedan por encima del enlace estirado. */
+	.tarjeta__meta,
+	.tarjeta__pie {
+		position: relative;
+		z-index: 1;
+	}
+</style>

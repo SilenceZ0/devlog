@@ -1,0 +1,41 @@
+---
+import { ESTADO_INFO } from '../site.config';
+import { formatearFecha, type HitoResuelto } from '../utils/posts';
+
+interface Props {
+	hitos: HitoResuelto[];
+	/** Los más recientes primero (por defecto van del más antiguo al más nuevo). */
+	invertir?: boolean;
+}
+
+const { hitos, invertir = false } = Astro.props;
+const lista = invertir ? [...hitos].reverse() : hitos;
+---
+
+{
+	lista.length === 0 ? (
+		<p class="vacio">
+			Todavía no hay hitos registrados. Añádelos en <code>src/data/hitos.json</code>.
+		</p>
+	) : (
+		<ol class="timeline">
+			{lista.map((hito) => (
+				<li class="timeline__item">
+					<p class="timeline__fecha">
+						<span>{formatearFecha(hito.fecha)}</span>
+						<span class="pildora pildora--estado" data-estado={hito.estado}>
+							{ESTADO_INFO[hito.estado]}
+						</span>
+					</p>
+					<h3 class="timeline__titulo">{hito.titulo}</h3>
+					<p class="timeline__texto">{hito.descripcion}</p>
+					{hito.entrada && (
+						<a class="timeline__enlace" href={hito.entrada.url}>
+							Leer: {hito.entrada.titulo} →
+						</a>
+					)}
+				</li>
+			))}
+		</ol>
+	)
+}

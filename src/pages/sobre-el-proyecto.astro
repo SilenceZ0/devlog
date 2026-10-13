@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITIO } from '../site.config';
+import { listarEntradas, listarHitos } from '../utils/posts';
+import { url } from '../utils/url';
+
+const entradas = await listarEntradas();
+const hitos = await listarHitos();
+const ultimoHito = hitos.at(-1);
+---
+
+<Base
+	titulo={`Sobre el proyecto · ${SITIO.nombre}`}
+	descripcion="Qué es Proj_TheYE y en qué punto está el desarrollo."
+>
+	<div class="contenedor contenedor--texto">
+		<header class="cabecera-pagina">
+			<p class="etiqueta-seccion">El proyecto</p>
+			<h1>Sobre {SITIO.nombre}</h1>
+			<p>{SITIO.descripcion}</p>
+		</header>
+
+		<div class="prosa">
+			<p>
+				Este sitio es el cuaderno de bitácora del desarrollo. Aquí voy anotando
+				decisiones, dudas, pruebas fallidas y avances del proyecto: sirve tanto para
+				ordenar mis propias ideas como para dejar constancia del proceso.
+			</p>
+
+			<h2>Estado actual</h2>
+			<ul>
+				<li>
+					<strong>Hitos registrados:</strong> {hitos.length}
+				</li>
+				<li>
+					<strong>Entradas publicadas:</strong> {entradas.length}
+				</li>
+				{
+					ultimoHito && (
+						<li>
+							<strong>Último hito:</strong> {ultimoHito.titulo}
+						</li>
+					)
+				}
+			</ul>
+
+			<h2>Por dónde empezar</h2>
+			<p>
+				Si es tu primera visita, el <a href={url('/timeline/')}>timeline</a> da la
+				vista rápida y las <a href={url('/entradas/')}>entradas</a> tienen el detalle.
+				En la <a href={url('/galeria/')}>galería</a> están todas las imágenes juntas.
+			</p>
+
+			<p>
+				<em>
+					Este texto es una plantilla: edítalo en
+					<code>src/pages/sobre-el-proyecto.astro</code>.
+				</em>
+			</p>
+		</div>
+	</div>
+</Base>

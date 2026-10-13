@@ -1,0 +1,92 @@
+---
+import { Image } from 'astro:assets';
+
+import type { ImagenGaleria } from '../utils/posts';
+
+interface Props {
+	imagenes: ImagenGaleria[];
+}
+
+const { imagenes } = Astro.props;
+const idGaleria = `g${Math.random().toString(36).slice(2, 9)}`;
+---
+
+{
+	imagenes.length > 0 && (
+		<>
+			<div class="galeria" data-galeria={idGaleria}>
+				{imagenes.map((imagen) => (
+					<button
+						type="button"
+						class="galeria__item"
+						aria-label={`Ampliar: ${imagen.alt}`}
+					>
+						<Image
+							src={imagen.src}
+							alt={imagen.alt}
+							widths={[400, 1200]}
+							sizes="(max-width: 40rem) 45vw, 260px"
+							loading="lazy"
+							decoding="async"
+						/>
+					</button>
+				))}
+			</div>
+
+			<dialog class="lightbox" data-lightbox={idGaleria}>
+				<button class="lightbox__cerrar" type="button" data-lightbox-cerrar aria-label="Cerrar imagen">
+					✕
+				</button>
+				<img src="" alt="" data-lightbox-imagen />
+				<p class="lightbox__pie" data-lightbox-pie></p>
+			</dialog>
+		</>
+	)
+}
+
+<script>
+	const elegirMayor = (imagen: HTMLImageElement): string => {
+		const candidatos = (imagen.getAttribute('srcset') ?? '')
+			.split(',')
+			.map((parte) => parte.trim().split(/\s+/)[0])
+			.filter(Boolean);
+		return candidatos.at(-1) ?? imagen.currentSrc ?? imagen.src;
+	};
+
+	document.addEventListener('click', (evento) => {
+		const destino = evento.target;
+		if (!(destino instanceof Element)) return;
+
+		// Cerrar con la X.
+		if (destino.closest('[data-lightbox-cerrar]')) {
+			destino.closest('dialog')?.close();
+			return;
+		}
+
+		// Clic en el fondo oscuro del lightbox.
+		if (destino instanceof HTMLDialogElement && destino.classList.contains('lightbox')) {
+			destino.close();
+			return;
+		}
+
+		// Abrir una imagen de la galería.
+		const item = destino.closest('.galeria__item');
+		if (!item) return;
+
+		const id = item.closest('[data-galeria]')?.getAttribute('data-galeria');
+		const dialog = document.querySelector(`dialog[data-lightbox="${id}"]`);
+		if (!(dialog instanceof HTMLDialogElement)) return;
+
+		const miniatura = item.querySelector('img');
+		const grande = dialog.querySelector('[data-lightbox-imagen]');
+		const pie = dialog.querySelector('[data-lightbox-pie]');
+
+		if (miniatura instanceof HTMLImageElement && grande instanceof HTMLImageElement) {
+			grande.src = elegirMayor(miniatura);
+			grande.alt = miniatura.alt;
+			if (pie) pie.textContent = miniatura.alt;
+		}
+
+		dialog.showModal();
+	});
+</script>

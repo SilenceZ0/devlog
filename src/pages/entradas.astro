@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import { CATEGORIA_INFO, SITIO } from '../site.config';
+import { agruparPorAnio, formatearFechaCorta, listarEntradas } from '../utils/posts';
+import { url } from '../utils/url';
+
+const entradas = await listarEntradas();
+const porAnio = agruparPorAnio(entradas);
+---
+
+<Base titulo={`Entradas · ${SITIO.nombre}`} descripcion="Todas las entradas del diario de desarrollo.">
+	<div class="contenedor contenedor--texto">
+		<header class="cabecera-pagina">
+			<p class="etiqueta-seccion">Archivo</p>
+			<h1>Todas las entradas</h1>
+			<p>
+				{entradas.length}{' '}
+				{entradas.length === 1 ? 'entrada publicada' : 'entradas publicadas'} · también
+				puedes usar el <a href={url('/buscar/')}>buscador</a>.
+			</p>
+		</header>
+
+		{
+			entradas.length === 0 ? (
+				<p class="vacio">No hay entradas todavía.</p>
+			) : (
+				porAnio.map((grupo) => (
+					<section class="anio" aria-labelledby={`anio-${grupo.anio}`}>
+						<h2 class="anio__titulo" id={`anio-${grupo.anio}`}>
+							{grupo.anio}
+						</h2>
+						<ul class="lista-entradas">
+							{grupo.entradas.map((entrada) => (
+								<li>
+									<a href={url(`/${entrada.id}/`)}>
+										<span class="lista-entradas__fecha">
+											{formatearFechaCorta(entrada.data.fecha)}
+										</span>
+										<span class="lista-entradas__titulo">
+											{entrada.data.titulo}
+										</span>
+										<span class="pildora">
+											{CATEGORIA_INFO[entrada.data.categoria].etiqueta}
+										</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</section>
+				))
+			)
+		}
+	</div>
+</Base>

@@ -1,0 +1,56 @@
+---
+import Gallery from '../components/Gallery.astro';
+import Base from '../layouts/Base.astro';
+import { SITIO } from '../site.config';
+import { enlaceEntrada, formatearFecha, listarEntradas } from '../utils/posts';
+
+const entradas = await listarEntradas();
+const conGaleria = entradas.filter((entrada) => entrada.data.galeria.length > 0);
+const totalImagenes = conGaleria.reduce(
+	(total, entrada) => total + entrada.data.galeria.length,
+	0,
+);
+---
+
+<Base
+	titulo={`Galería · ${SITIO.nombre}`}
+	descripcion="Todas las imágenes y concept art del proyecto."
+>
+	<div class="contenedor">
+		<header class="cabecera-pagina">
+			<p class="etiqueta-seccion">Imágenes</p>
+			<h1>Galería</h1>
+			<p>
+				{totalImagenes} {totalImagenes === 1 ? 'imagen' : 'imágenes'} repartidas en
+				{' '}{conGaleria.length}
+				{conGaleria.length === 1 ? ' entrada' : ' entradas'}. Pulsa una imagen para
+				ampliarla.
+			</p>
+		</header>
+
+		{
+			conGaleria.length === 0 ? (
+				<p class="vacio">
+					Aún no hay imágenes. Añádelas en el campo <code>galeria</code> del front
+					matter de cualquier entrada.
+				</p>
+			) : (
+				conGaleria.map((entrada) => (
+					<section class="seccion" aria-labelledby={`gal-${entrada.id}`}>
+						<div class="seccion__cabecera">
+							<h2 class="seccion__titulo" id={`gal-${entrada.id}`}>
+								<a href={enlaceEntrada(entrada)}>{entrada.data.titulo}</a>
+							</h2>
+							<span class="etiqueta-seccion">
+								{formatearFecha(entrada.data.fecha)} ·{' '}
+								{entrada.data.galeria.length}{' '}
+								{entrada.data.galeria.length === 1 ? 'imagen' : 'imágenes'}
+							</span>
+						</div>
+						<Gallery imagenes={entrada.data.galeria} />
+					</section>
+				))
+			)
+		}
+	</div>
+</Base>
